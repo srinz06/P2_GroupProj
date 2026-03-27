@@ -248,13 +248,205 @@ int main() {
             }
         }
 
-        // continue with reset of choices
+        // range from dates
+        else if (choice == 2) 
+        {
+            string index, startDate, endDate;
+            cout << "Enter index (i.e NYA): ";
+            getline(cin, index);
+            cout << "Enter start date (YYYY-MM-DD): ";
+            getline(cin, startDate);
+            cout << "Enter end date   (YYYY-MM-DD): ";
+            getline(cin, endDate);
+
+            string starting_key = index + "_" + startDate;
+            string ending_key   = index + "_" + endDate;
+
+            start = high_resolution_clock::now();
+            vector<StockRecord> bplus_range = bpt.range_get_keys(starting_key, ending_key);
+
+            end = high_resolution_clock::now();
+            double b_plus_time = duration<double, milli>(end - start).count();
+
+            start = high_resolution_clock::now();
+            vector<StockRecord> heapRange = heap.range_get_keys(starting_key, ending_key);
+
+            end = high_resolution_clock::now();
+            double heap_time = duration<double, milli>(end - start).count();
+
+            print_times("Range", b_plus_time, to_string(bplus_range.size()) + " records", heap_time, to_string(heapRange.size()) + " records");
+
+            if (!bplus_range.empty()) {
+                cout << "\nFirst 5 results (from B+ Tree):" << endl;
+                int count = 0;
+                for (int i = 0; i < (int)bplus_range.size(); i++) {
+                    if (count >= 5) {
+                        break;
+                    }
+                    print_record(bplus_range[i]);
+                    cout << "  --------" << endl;
+                    count++;
+                }
+            }
+        }
+
+        // finding the min key/value
+        else if (choice == 3) {
+            start = high_resolution_clock::now();
+            StockRecord* bptMin = bpt.get_min_val();
+
+            end = high_resolution_clock::now();
+            double b_plus_time = duration<double, milli>(end - start).count();
+
+            start = high_resolution_clock::now();
+            StockRecord heap_min_val = heap.get_min_val();
+
+            end = high_resolution_clock::now();
+            double heap_time = duration<double, milli>(end - start).count();
+
+            string bpt_min_status;
+            if (bptMin) {
+                bpt_min_status = bptMin->key;
+            } 
+            
+            else {
+                bpt_min_status = "N/A";
+            }
+
+            print_times("Get Minimum Key (not earliest date)", b_plus_time, bpt_min_status, heap_time, heap_min_val.key);
+
+            // res is the minimum key (Index_Date) not earliest date. 
+            //keys are alphabetical so 0 comes before letters
+            cout << "\nMinimum key record:" << endl;
+            print_record(heap_min_val);
+        }
+
+        // insert new entry
+        else if (choice == 4) {
+            StockRecord r;
+            cout << "Enter index (e.g. NYA): ";
+            getline(cin, r.index);
+
+            cout << "Enter date (YYYY-MM-DD): ";
+            getline(cin, r.date);
+
+            cout << "Enter open price: ";
+            cin >> r.open;
+
+            cout << "Enter high price: ";
+            cin >> r.high;
+
+            cout << "Enter low price: ";
+            cin >> r.low;
+
+            cout << "Enter close price: ";
+            cin >> r.close;
+
+            cout << "Enter adj close: ";
+            cin >> r.adjClose;
+
+            cout << "Enter volume: ";
+            cin >> r.volume;
+
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            r.key = r.index + "_" + r.date;
+
+            start = high_resolution_clock::now();
+            bpt.insert(r);
+
+            end = high_resolution_clock::now();
+            double b_plus_time = duration<double, milli>(end - start).count();
+
+            start = high_resolution_clock::now();
+            heap.insert(r);
+
+            end = high_resolution_clock::now();
+            double heap_time = duration<double, milli>(end - start).count();
+
+            print_times("Insert: " + r.key, b_plus_time, "Inserted", heap_time, "Inserted");
+        }
+
+        // option 5 for deleting an entry 
+        else if (choice == 5) {
+            string index, date, key;
+            cout << "Enter index (i.e NYA): ";
+            getline(cin, index);
+            cout << "Enter date (YYYY-MM-DD): ";
+            getline(cin, date);
+            key = index + "_" + date;
+
+            start = high_resolution_clock::now();
+            bool bptDel = bpt.delete_node(key);
+
+            end = high_resolution_clock::now();
+            double b_plus_time = duration<double, milli>(end - start).count();
+
+            start = high_resolution_clock::now();
+            bool heapDel = heap.delete_node(key);
+
+            end = high_resolution_clock::now();
+
+            double heap_time = duration<double, milli>(end - start).count();
+
+            string bpt_del_status;
+            string heap_del_status;
+
+            if (bptDel) {
+                bpt_del_status = "Deleted";
+            } 
+            
+            else {
+                bpt_del_status = "Not found";
+            }
+
+            if (heapDel) {
+                heap_del_status = "Deleted";
+            } 
+            
+            else {
+                heap_del_status = "Not found";
+            }
+
+            print_times("Delete: " + key, b_plus_time, bpt_del_status, heap_time, heap_del_status);
+
+
+        }
+
+        // choice 6 which gives all the stock exchanges listed. came with the Kaggle dataset but 
+        // i just hardcoded it like this
+        else if (choice == 6) {
+            cout << "\n ----Available Stock Exchanges---- " << endl;
+            cout << left << setw(12) << "Index" << setw(16) << "Region" << setw(32) << "Exchange" << setw(6)  << "Cur" << setw(13) << "Earliest" << "Latest" << endl;
+            cout << string(90, '-') << endl;
+
+            for (auto it = indexInfo.begin(); it != indexInfo.end(); it++) {
+                const string& idx = it->first;
+                string region   = "-";
+                string exchange = "-";
+                string currency_val      = "-";
+
+
+                if (ex_list.count(idx)) {
+                    region = get<0>(ex_list.at(idx));
+                    exchange = get<1>(ex_list.at(idx));
+                    currency_val = get<2>(ex_list.at(idx));
+                }
 
 
 
+                cout << left << setw(12) << idx << setw(16) << region << setw(32) << exchange << setw(6)  << currency_val << setw(13) << it->second.first << it->second.second << endl;
+            }
+        }
 
+        // option 7 is just break and exit
+        else if (choice == 7) {
+            cout << "\nGoodbye!" << endl;
+        }
+
+        //any invalid inputs can just get caught here
+        else {
+            cout << "Invalid option. Please choose 1-7." << endl;
+        }
     }
-
-
     return 0;
 }
