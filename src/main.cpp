@@ -12,7 +12,7 @@
 
 #include "StockRecord.h"
 #include "BPlusTree.h"
-#include "MinHeap.h"
+#include "Minheap.h"
 
 using namespace std;
 using namespace chrono;
