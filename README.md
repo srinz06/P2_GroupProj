@@ -17,7 +17,7 @@ This program loads trading data from 14 global stock exchanges and compares the 
 ## Requirements
 
 - g++ (C++17)
-- data.csv must be in the same folder as the source files when you run the program
+- **data.csv** must be in the same folder as the source files when you run the program
 
 ---
 
@@ -27,7 +27,7 @@ This program loads trading data from 14 global stock exchanges and compares the 
 g++ -o stock main.cpp BPlusTree.cpp MinHeap.cpp -std=c++17
 
 
-**Step 2 — Run:**
+**Step 2 - Run:**
 ./stock
 
 The program will automatically load **data.csv** and build both data structures and print the times it took to build each.
@@ -36,19 +36,19 @@ The program will automatically load **data.csv** and build both data structures 
 
 ## Features
 
-1. Search by Index + Date: find a specific trading day by exchange and date
+1. **Search by Index + Date:** find a specific trading day by exchange and date
 
-2. Range Query: find all records for an exchange within a date range
+2. **Range of Entries:** find all records for an exchange within a date range
 
-3. Get Minimum Key: find the record with the smallest composite key
+3. **Get Minimum Key:** find the record with the smallest composite key
 
-4. Insert a new record: add a new entry to both structures
+4. **Insert a new record:** add a new entry to both structures
 
-5. Delete a record: remove an entry from both structures
+5. **Delete a record:** remove an entry from both structures
 
-6. List all stock exchanges: view all 14 exchanges with region, currency, and date range
+6. **List all stock exchanges:** view all 14 exchanges with region, currency, and date range
 
-7. Exit
+7. **Exit**
 
 Every operation runs on both structures simultaneously and then the times it took for each is printed so we can compare. Quick note is that the timing is kept in ms, but sometimes the operations would run too fast so the timing would get rounded down to 0ms.
 
